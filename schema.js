@@ -1,6 +1,6 @@
-import {gql} from '@apollo/server'
 
-const typeDefs = gql`
+
+export const typeDefs = `#graphql
   type Book {
     _id: ID!
     title: String!
@@ -17,6 +17,6 @@ const typeDefs = gql`
     updateBook(id: ID!, title: String, author: String): Book
     deleteBook(id: ID!): Book
   }
-`;
+  `
 
-module.exports = typeDefs;
+
