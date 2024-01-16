@@ -1,5 +1,5 @@
 // resolvers.js
-import Book from './models/Book.js';
+import {Book} from './models/Book.js';
 
 
 const resolvers = {
