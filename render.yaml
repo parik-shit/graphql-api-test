@@ -8,4 +8,4 @@ services:
       - key: PORT
         value: 3000
       - key: MONGODB_URI
-        value: mongodb+srv://parikshit152018:vDkH12x5LPPgFdia@cluster0.l1xtqtu.mongodb.net/?retryWrites=true&w=majority
+        value: "mongodb+srv://parikshit152018:vDkH12x5LPPgFdia@cluster0.l1xtqtu.mongodb.net/?retryWrites=true&w=majority"
