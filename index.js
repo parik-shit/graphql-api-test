@@ -6,7 +6,6 @@ import {typeDefs} from './schema.js';
 import {resolvers} from './resolvers.js';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import express from 'express';
 import cors from 'cors';
 
 const app = express();
