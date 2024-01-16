@@ -1,5 +1,6 @@
 // resolvers.js
-const Book = require('./models/Book');
+import Book from './models/Book.js';
+
 
 const resolvers = {
   Query: {
