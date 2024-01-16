@@ -1,36 +1,75 @@
-// server.js
-import { ApolloServer } from '@apollo/server';
-import { express as expressMiddleware } from '@apollo/server/express4';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import http from 'http';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import { typeDefs, resolvers } from './schema';
+const { ApolloServer } = require('apollo-server-express');
+const express = require('express');
+const mongoose = require('mongoose');
 
-const app = express();
-const httpServer = http.createServer(app);
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-});
-
-await server.start();
-
-// MongoDB Atlas connection
+// Connect to MongoDB
 mongoose.connect('mongodb+srv://parikshit152018:vDkH12x5LPPgFdia@cluster0.l1xtqtu.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-app.use(
-  '/graphql',
-  cors(),
-  express.json(),
-  expressMiddleware(server, {
-    context: async ({ req }) => ({ token: req.headers.token }),
-  })
-);
+// Define a simple mongoose model
+const Book = mongoose.model('Book', {
+  title: String,
+  author: String,
+});
 
-await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
-console.log(`🚀 Server ready at http://localhost:4000/graphql`);
+// GraphQL schema
+const typeDefs = `
+  type Book {
+    id: ID!
+    title: String!
+    author: String!
+  }
+
+  type Query {
+    books: [Book]
+    book(id: ID!): Book
+  }
+
+  type Mutation {
+    addBook(title: String!, author: String!): Book
+    updateBook(id: ID!, title: String!, author: String!): Book
+    deleteBook(id: ID!): Book
+  }
+`;
+
+// GraphQL resolvers
+const resolvers = {
+  Query: {
+    books: async () => {
+      return await Book.find();
+    },
+    book: async (_, { id }) => {
+      return await Book.findById(id);
+    },
+  },
+  Mutation: {
+    addBook: async (_, { title, author }) => {
+      const book = new Book({ title, author });
+      await book.save();
+      return book;
+    },
+    updateBook: async (_, { id, title, author }) => {
+      return await Book.findByIdAndUpdate(id, { title, author }, { new: true });
+    },
+    deleteBook: async (_, { id }) => {
+      return await Book.findByIdAndDelete(id);
+    },
+  },
+};
+
+// Create an Apollo Server with Express
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
+
+const app = express();
+server.applyMiddleware({ app });
+
+// Start the server
+const PORT = 4000;
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}/graphql`);
+});
